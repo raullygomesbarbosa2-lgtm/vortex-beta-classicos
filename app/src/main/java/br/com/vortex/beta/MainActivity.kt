@@ -28,10 +28,10 @@ class MainActivity : AppCompatActivity() {
         SystemInfo("Super Nintendo", "libsnes9x_libretro_android.so", "smc|sfc|swc|fig"),
         SystemInfo("Game Boy", "libgambatte_libretro_android.so", "gb|gbc"),
         SystemInfo("Game Boy Advance", "libmednafen_gba_libretro_android.so", "gba"),
-        SystemInfo("Sega Genesis / Mega Drive", "libpicodrive_libretro_android.so", "bin|gen|md|smd"),
-        SystemInfo("Sega Master System", "libgenesis_plus_gx_libretro_android.so", "sms|gg"),
+        SystemInfo("Sega Genesis / Mega Drive", "libgenesis_plus_gx_libretro_android.so", "bin|gen|md|smd"),
         SystemInfo("PC Engine / TurboGrafx-16", "libmednafen_pce_fast_libretro_android.so", "pce|cue|ccd"),
         SystemInfo("Atari Lynx", "libmednafen_lynx_libretro_android.so", "lnx"),
+        SystemInfo("Neo Geo Pocket", "libmednafen_ngp_libretro_android.so", "ngp|ngc"),
         SystemInfo("WonderSwan", "libmednafen_wswan_libretro_android.so", "ws|wsc|pc2")
     )
     private val neon = Color.rgb(53, 255, 20)
