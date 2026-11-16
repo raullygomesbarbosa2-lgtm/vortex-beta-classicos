@@ -1,0 +1,15 @@
+plugins { id 'com.android.application'; id 'org.jetbrains.kotlin.android' }
+
+android {
+    namespace 'br.com.vortex.beta'
+    compileSdk 35
+    defaultConfig { applicationId 'br.com.vortex.beta'; minSdk 23; targetSdk 35; versionCode 1; versionName '0.1.0-beta'; ndk { abiFilters 'arm64-v8a' } }
+    buildTypes { release { minifyEnabled false } }
+    packaging { jniLibs { useLegacyPackaging = true } }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
+    implementation 'com.github.Swordfish90:LibretroDroid:0.13.2'
+}
