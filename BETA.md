@@ -4,7 +4,7 @@ Projeto Android criado como base nova, separado dos apps anteriores. Seleciona a
 
 ## Dez sistemas e seus núcleos
 
-Atari 2600 (Stella), NES (FCEUmm), SNES (Snes9x), Game Boy (Gambatte), Game Boy Advance (Beetle GBA), Sega Genesis/Mega Drive (PicoDrive), Sega Master System (Genesis Plus GX), PC Engine/TurboGrafx-16 (Beetle PCE Fast), Atari Lynx (Beetle Lynx) e WonderSwan (Beetle WonderSwan).
+Atari 2600 (Stella), NES (FCEUmm), SNES (Snes9x), Game Boy (Gambatte), Game Boy Advance (Beetle GBA), Sega Genesis/Mega Drive (Genesis Plus GX), PC Engine/TurboGrafx-16 (Beetle PCE Fast), Atari Lynx (Beetle Lynx), Neo Geo Pocket (Beetle NGP) e WonderSwan (Beetle WonderSwan).
 
 É um núcleo compatível por sistema, não dez variantes de núcleo para cada console. Os núcleos são compilados do código oficial Libretro para ARM64 no GitHub Actions. ROM hacks devem ser arquivos patchados pelo usuário; o APK não distribui ROMs nem BIOS.
 
