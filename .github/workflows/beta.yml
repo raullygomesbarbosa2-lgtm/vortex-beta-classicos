@@ -47,7 +47,7 @@ jobs:
           build_core mednafen_ngp https://github.com/libretro/beetle-ngp-libretro.git master jni mednafen_ngp_libretro_android.so
           build_core mednafen_pce_fast https://github.com/libretro/beetle-pce-fast-libretro.git master jni mednafen_pce_fast_libretro_android.so
           build_core mednafen_lynx https://github.com/libretro/beetle-lynx-libretro.git master jni mednafen_lynx_libretro_android.so
-          build_core genesis_plus_gx https://github.com/libretro/Genesis-Plus-GX-Wide.git master libretro/jni genesis_plus_gx_libretro_android.so
+          build_core genesis_plus_gx https://github.com/libretro/Genesis-Plus-GX-Wide.git main libretro/jni genesis_plus_gx_libretro_android.so
           build_core mednafen_wswan https://github.com/libretro/beetle-wswan-libretro.git master jni mednafen_wswan_libretro_android.so
           build_core mednafen_wswan https://github.com/libretro/beetle-wswan-libretro.git master jni mednafen_wswan_libretro_android.so
           cd "$GITHUB_WORKSPACE"
