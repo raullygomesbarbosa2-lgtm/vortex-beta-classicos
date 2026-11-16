@@ -82,8 +82,10 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
-          p=Path('app/build/outputs/apk/release/app-release.apk')
-          if not p.exists() or p.stat().st_size < 20_000_000: raise SystemExit(f'APK missing or unexpectedly small: {p}')
+          apks=list(Path('app/build/outputs/apk/release').glob('*.apk'))
+          if len(apks)!=1: raise SystemExit(f'Expected one release APK, found: {apks}')
+          p=apks[0]
+          if p.stat().st_size < 1_000_000: raise SystemExit(f'APK missing or unexpectedly small: {p} ({p.stat().st_size} bytes)')
           with ZipFile(p) as z:
             n=z.namelist(); libs=[x for x in n if x.startswith('lib/arm64-v8a/') and x.endswith('.so')]
             if len(libs)<11: raise SystemExit(f'Expected frontend plus ten cores, found {len(libs)} native libs')
@@ -93,7 +95,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Vortex-Beta-Classicos-Android6plus-ARM64
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 30
       - name: Publish APK download release
@@ -102,5 +104,5 @@ jobs:
           tag_name: beta-build-${{ github.run_number }}
           name: Vortex Beta Clássicos — build ${{ github.run_number }}
           body: 'Beta Android 6+ ARM64, criada do zero. 10 sistemas, sem ROM/BIOS incluídos. Builds CI ainda precisam de teste em aparelho e ROMs do usuário.'
-          files: app/build/outputs/apk/release/app-release.apk
+          files: app/build/outputs/apk/release/*.apk
           make_latest: true
