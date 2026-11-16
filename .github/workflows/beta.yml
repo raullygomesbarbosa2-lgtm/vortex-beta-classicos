@@ -44,7 +44,7 @@ jobs:
           build_core snes9x https://github.com/libretro/snes9x.git master libretro/jni snes9x_libretro_android.so
           build_core gambatte https://github.com/libretro/gambatte-libretro.git master libgambatte/libretro/jni gambatte_libretro_android.so
           build_core mednafen_gba https://github.com/libretro/beetle-gba-libretro.git master jni mednafen_gba_libretro_android.so
-          build_core picodrive https://github.com/libretro/picodrive.git master jni picodrive_libretro_android.so
+          build_core mednafen_ngp https://github.com/libretro/beetle-ngp-libretro.git master jni mednafen_ngp_libretro_android.so
           build_core mednafen_pce_fast https://github.com/libretro/beetle-pce-fast-libretro.git master jni mednafen_pce_fast_libretro_android.so
           build_core mednafen_lynx https://github.com/libretro/beetle-lynx-libretro.git master jni mednafen_lynx_libretro_android.so
           build_core genesis_plus_gx https://github.com/libretro/Genesis-Plus-GX-Wide.git master libretro/jni genesis_plus_gx_libretro_android.so
