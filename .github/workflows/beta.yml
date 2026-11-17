@@ -25,43 +25,53 @@ jobs:
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
           yes | "$S" --sdk_root="$ANDROID_HOME" --licenses
           "$S" --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0" "ndk;${NDK_VERSION}" "cmake;3.22.1"
-      - name: Build ten official Libretro system cores for ARM64
+      - name: Download 100 official Libretro ARM64 cores
         run: |
           set -euo pipefail
-          mkdir -p app/src/main/jniLibs/arm64-v8a
-          build_core() {
-            id="$1" repo="$2" branch="$3" subdir="$4" output="$5"
-            src="$RUNNER_TEMP/$id"
-            git clone --depth 1 --branch "$branch" "$repo" "$src"
-            cd "$src/$subdir"
-            "$ANDROID_HOME/ndk/${NDK_VERSION}/ndk-build" APP_ABI=arm64-v8a APP_PLATFORM=android-23 -j2
-            core=$(find "$src" -type f -path '*/arm64-v8a/libretro.so' -print -quit)
-            test -n "$core"
-            cp "$core" "$GITHUB_WORKSPACE/app/src/main/jniLibs/arm64-v8a/lib${output}"
-          }
-          build_core stella2014 https://github.com/libretro/stella2014-libretro.git master jni stella2014_libretro_android.so
-          build_core fceumm https://github.com/libretro/libretro-fceumm.git master jni fceumm_libretro_android.so
-          build_core snes9x https://github.com/libretro/snes9x.git master libretro/jni snes9x_libretro_android.so
-          build_core gambatte https://github.com/libretro/gambatte-libretro.git master libgambatte/libretro/jni gambatte_libretro_android.so
-          build_core mednafen_gba https://github.com/libretro/beetle-gba-libretro.git master jni mednafen_gba_libretro_android.so
-          build_core mednafen_ngp https://github.com/libretro/beetle-ngp-libretro.git master jni mednafen_ngp_libretro_android.so
-          build_core mednafen_pce_fast https://github.com/libretro/beetle-pce-fast-libretro.git master jni mednafen_pce_fast_libretro_android.so
-          build_core mednafen_lynx https://github.com/libretro/beetle-lynx-libretro.git master jni mednafen_lynx_libretro_android.so
-          build_core genesis_plus_gx https://github.com/libretro/Genesis-Plus-GX-Wide.git main libretro/jni genesis_plus_gx_libretro_android.so
-          build_core mednafen_wswan https://github.com/libretro/beetle-wswan-libretro.git master jni mednafen_wswan_libretro_android.so
-          cd "$GITHUB_WORKSPACE"
-      - name: Verify ten native ARM64 core libraries
+          python3 - <<'PY'
+          import concurrent.futures, io, json, struct, urllib.request, zipfile
+          from pathlib import Path
+          catalog = json.loads(Path('app/src/main/assets/cores.json').read_text())
+          out = Path('app/src/main/jniLibs/arm64-v8a'); out.mkdir(parents=True, exist_ok=True)
+          base = 'https://buildbot.libretro.com/nightly/android/latest/arm64-v8a/'
+          def get_core(item):
+              ident = item['id']
+              url = base + ident + '_libretro_android.so.zip'
+              req = urllib.request.Request(url, headers={'User-Agent':'MegaDriveHack-AndroidCorePack/1.0'})
+              with urllib.request.urlopen(req, timeout=180) as response:
+                  payload = response.read()
+              with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                  members = [n for n in archive.namelist() if n.endswith('.so') and not n.endswith('/')]
+                  if len(members) != 1:
+                      raise RuntimeError(f'{ident}: expected one shared library in official zip; found {members}')
+                  binary = archive.read(members[0])
+              if len(binary) < 4096 or binary[:6] != b'\x7fELF\x02\x01' or struct.unpack_from('<H', binary, 18)[0] != 183:
+                  raise RuntimeError(f'{ident}: core is not a valid ARM64 ELF shared library')
+              (out / item['core']).write_bytes(binary)
+              return ident, len(binary)
+          if len(catalog) != 100 or len({x['id'] for x in catalog}) != 100:
+              raise SystemExit('Core catalog must contain exactly 100 unique cores')
+          with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
+              for ident, size in pool.map(get_core, catalog):
+                  print(f'Fetched {ident}: {size} bytes')
+          print(f'Downloaded and checked {len(catalog)} official Android ARM64 Libretro cores.')
+          PY
+      - name: Verify 100 native ARM64 core libraries
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import struct
+          import json, struct
+          catalog=json.loads(Path('app/src/main/assets/cores.json').read_text())
           p=Path('app/src/main/jniLibs/arm64-v8a')
           libs=list(p.glob('*.so'))
-          if len(libs)!=10: raise SystemExit(f'Expected 10 cores, found {len(libs)}')
+          expected={x['core'] for x in catalog}
+          actual={x.name for x in libs}
+          if len(catalog)!=100 or len(expected)!=100: raise SystemExit('Catalog is not 100 unique cores')
+          if actual!=expected: raise SystemExit(f'Core files mismatch; missing={expected-actual}, extra={actual-expected}')
           for f in libs:
             d=f.read_bytes()
             if d[:6]!=b'\x7fELF\x02\x01' or struct.unpack_from('<H',d,18)[0]!=183: raise SystemExit(f'Not ARM64 ELF: {f}')
-          print('Ten ARM64 Libretro core libraries verified.')
+          print('Exactly 100 official ARM64 Libretro core libraries verified.')
           PY
       - name: Sign Beta APK with temporary CI key
         run: |
@@ -88,13 +98,13 @@ jobs:
           if p.stat().st_size < 1_000_000: raise SystemExit(f'APK missing or unexpectedly small: {p} ({p.stat().st_size} bytes)')
           with ZipFile(p) as z:
             n=z.namelist(); libs=[x for x in n if x.startswith('lib/arm64-v8a/') and x.endswith('.so')]
-            if len(libs)<11: raise SystemExit(f'Expected frontend plus ten cores, found {len(libs)} native libs')
+            if len(libs)<101: raise SystemExit(f'Expected frontend plus 100 cores, found {len(libs)} native libs')
             if any(x.startswith('lib/armeabi') for x in n): raise SystemExit('Unexpected ABI packaged')
           print('APK built and contains ten core libraries:', p.stat().st_size, 'bytes')
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: Mega-Drive-Hack-Android6plus-ARM64
+          name: Mega-Drive-Hack-100-Cores-Android6plus-ARM64
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 30
@@ -103,6 +113,6 @@ jobs:
         with:
           tag_name: beta-build-${{ github.run_number }}
           name: Mega Drive Hack — build ${{ github.run_number }}
-          body: 'Beta Android 6+ ARM64, criada do zero. 10 sistemas, sem ROM/BIOS incluídos. Builds CI ainda precisam de teste em aparelho e ROMs do usuário.'
+          body: 'Mega Drive Hack Beta, Android 6+ ARM64. 100 núcleos Libretro oficiais, sem ROM/BIOS incluídos. ROMs do usuário; testes em aparelho físico ainda pendentes.'
           files: app/build/outputs/apk/release/*.apk
           make_latest: true

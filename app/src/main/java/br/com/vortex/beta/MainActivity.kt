@@ -30,21 +30,18 @@ import com.swordfish.libretrodroid.LibretroDroid
 import com.swordfish.libretrodroid.ShaderConfig
 import java.io.File
 import kotlin.math.min
+import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
     data class SystemInfo(val name: String, val core: String, val extensions: String)
-    private val systems = listOf(
-        SystemInfo("Atari 2600", "libstella2014_libretro_android.so", "a26|bin|rom"),
-        SystemInfo("Nintendo Entertainment System", "libfceumm_libretro_android.so", "nes|unf|unif|fds"),
-        SystemInfo("Super Nintendo", "libsnes9x_libretro_android.so", "smc|sfc|swc|fig"),
-        SystemInfo("Game Boy", "libgambatte_libretro_android.so", "gb|gbc"),
-        SystemInfo("Game Boy Advance", "libmednafen_gba_libretro_android.so", "gba"),
-        SystemInfo("Sega Genesis / Mega Drive", "libgenesis_plus_gx_libretro_android.so", "bin|gen|md|smd"),
-        SystemInfo("PC Engine / TurboGrafx-16", "libmednafen_pce_fast_libretro_android.so", "pce|cue|ccd"),
-        SystemInfo("Atari Lynx", "libmednafen_lynx_libretro_android.so", "lnx"),
-        SystemInfo("Neo Geo Pocket", "libmednafen_ngp_libretro_android.so", "ngp|ngc"),
-        SystemInfo("WonderSwan", "libmednafen_wswan_libretro_android.so", "ws|wsc|pc2")
-    )
+    private val systems: List<SystemInfo> by lazy {
+        val catalog = assets.open("cores.json").bufferedReader().use { it.readText() }
+        val entries = JSONArray(catalog)
+        (0 until entries.length()).map { index ->
+            val entry = entries.getJSONObject(index)
+            SystemInfo(entry.getString("name"), entry.getString("core"), entry.getString("extensions"))
+        }
+    }
     private val neon = Color.rgb(53, 255, 20)
     private val bg = Color.rgb(5, 10, 8)
     private val picker = 431
@@ -172,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(18, 12, 18, 20) }
         column.addView(label("MEGA DRIVE HACK", 32f, neon, true))
         column.addView(label("BETA CLÁSSICA  •  Android 6+  •  ARM64", 14f, Color.LTGRAY))
-        column.addView(label("10 sistemas clássicos · escolha um e abra sua ROM hack", 17f, Color.WHITE))
+        column.addView(label("100 núcleos clássicos · selecione um e abra sua ROM", 17f, Color.WHITE))
         controllerStatus = label("", 14f, neon)
         column.addView(controllerStatus)
         updateControllerStatus()
