@@ -266,6 +266,34 @@ class MainActivity : AppCompatActivity() {
         override fun performClick(): Boolean { super.performClick(); return true }
     }
 
+    private fun sourceAspectRatio(system: SystemInfo, rom: File): Float {
+        val ext = rom.extension.lowercase()
+        return when {
+            ext == "gb" || ext == "gbc" || system.core.contains("gambatte") || system.core.contains("gearboy") || system.core.contains("sameboy") || system.core.contains("mednafen_ngp") -> 10f / 9f
+            ext == "gba" || system.core.contains("mednafen_gba") || system.core.contains("gpsp") || system.core.contains("vbam") || system.core.contains("vba_next") -> 3f / 2f
+            system.core.contains("mednafen_wswan") -> 224f / 144f
+            system.core.contains("mednafen_lynx") || system.core.contains("gearlynx") || system.core.contains("handy") -> 160f / 102f
+            else -> 4f / 3f
+        }
+    }
+
+    private fun stretchGameplayToFill(root: FrameLayout, view: GLRetroView, system: SystemInfo, rom: File) {
+        root.clipChildren = true
+        root.clipToPadding = true
+        view.post {
+            val width = root.width.toFloat()
+            val height = root.height.toFloat()
+            if (width > 0f && height > 0f && view.width > 0) {
+                val displayAspect = width / height
+                val gameAspect = sourceAspectRatio(system, rom)
+                // GLRetroView preserves the original aspect ratio. Scale only its X axis
+                // so that the rendered gameplay reaches both screen edges; overlays remain untouched.
+                view.pivotX = view.width / 2f
+                view.scaleX = displayAspect / gameAspect
+            }
+        }
+    }
+
     private fun launchGame(system: SystemInfo, rom: File) {
         selected = system
         @Suppress("DEPRECATION")
@@ -276,7 +304,7 @@ class MainActivity : AppCompatActivity() {
             gameFilePath = rom.absolutePath
             systemDirectory = filesDir.absolutePath
             savesDirectory = File(filesDir, "saves").apply { mkdirs() }.absolutePath
-            shader = ShaderConfig.Default
+            shader = ShaderConfig.Sharp
             preferLowLatencyAudio = true
         }
         val root = FrameLayout(this).apply { setBackgroundColor(Color.BLACK) }
@@ -317,6 +345,7 @@ class MainActivity : AppCompatActivity() {
         controls.addView(aux)
         root.addView(controls, FrameLayout.LayoutParams(-1, dp(174), Gravity.BOTTOM))
         setContentView(root)
+        stretchGameplayToFill(root, view, system, rom)
         view.requestFocus()
     }
 
