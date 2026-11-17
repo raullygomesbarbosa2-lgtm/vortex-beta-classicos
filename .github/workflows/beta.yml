@@ -35,23 +35,33 @@ jobs:
           out = Path('app/src/main/jniLibs/arm64-v8a'); out.mkdir(parents=True, exist_ok=True)
           base = 'https://buildbot.libretro.com/nightly/android/latest/arm64-v8a/'
           def get_core(item):
+              import time
               ident = item['id']
               url = base + ident + '_libretro_android.so.zip'
-              req = urllib.request.Request(url, headers={'User-Agent':'MegaDriveHack-AndroidCorePack/1.0'})
-              with urllib.request.urlopen(req, timeout=180) as response:
-                  payload = response.read()
-              with zipfile.ZipFile(io.BytesIO(payload)) as archive:
-                  members = [n for n in archive.namelist() if n.endswith('.so') and not n.endswith('/')]
-                  if len(members) != 1:
-                      raise RuntimeError(f'{ident}: expected one shared library in official zip; found {members}')
-                  binary = archive.read(members[0])
-              if len(binary) < 4096 or binary[:6] != b'\x7fELF\x02\x01' or struct.unpack_from('<H', binary, 18)[0] != 183:
-                  raise RuntimeError(f'{ident}: core is not a valid ARM64 ELF shared library')
-              (out / item['core']).write_bytes(binary)
-              return ident, len(binary)
+              last_error = None
+              for attempt in range(1, 6):
+                  try:
+                      req = urllib.request.Request(url, headers={'User-Agent':'MegaDriveHack-AndroidCorePack/1.0'})
+                      with urllib.request.urlopen(req, timeout=300) as response:
+                          payload = response.read()
+                      with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                          members = [n for n in archive.namelist() if n.endswith('.so') and not n.endswith('/')]
+                          if len(members) != 1:
+                              raise RuntimeError(f'{ident}: expected one shared library in official zip; found {members}')
+                          binary = archive.read(members[0])
+                      if len(binary) < 4096 or binary[:6] != b'\x7fELF\x02\x01' or struct.unpack_from('<H', binary, 18)[0] != 183:
+                          raise RuntimeError(f'{ident}: core is not a valid ARM64 ELF shared library')
+                      (out / item['core']).write_bytes(binary)
+                      return ident, len(binary)
+                  except Exception as error:
+                      last_error = error
+                      if attempt < 5:
+                          print(f'Retry {attempt}/5 for {ident}: {error}', flush=True)
+                          time.sleep(min(5 * attempt, 25))
+              raise RuntimeError(f'Could not download {ident} after five attempts: {last_error}')
           if len(catalog) != 100 or len({x['id'] for x in catalog}) != 100:
               raise SystemExit('Core catalog must contain exactly 100 unique cores')
-          with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
               for ident, size in pool.map(get_core, catalog):
                   print(f'Fetched {ident}: {size} bytes')
           print(f'Downloaded and checked {len(catalog)} official Android ARM64 Libretro cores.')
