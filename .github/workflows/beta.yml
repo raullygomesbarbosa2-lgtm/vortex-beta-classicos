@@ -1,4 +1,4 @@
-name: Vortex Beta — 10 sistemas clássicos
+name: Mega Drive Hack — 10 sistemas clássicos
 on:
   workflow_dispatch:
   push:
@@ -65,7 +65,7 @@ jobs:
           PY
       - name: Sign Beta APK with temporary CI key
         run: |
-          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/vortex-beta.jks" -storepass beta-ci-only -keypass beta-ci-only -alias vortex-beta -dname 'CN=Vortex Beta CI,O=Vortex Beta,C=BR' -keyalg RSA -keysize 2048 -validity 3650
+          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/vortex-beta.jks" -storepass beta-ci-only -keypass beta-ci-only -alias vortex-beta -dname 'CN=Mega Drive Hack CI,O=Mega Drive Hack,C=BR' -keyalg RSA -keysize 2048 -validity 3650
           python3 - <<'PY'
           from pathlib import Path
           p=Path('app/build.gradle'); s=p.read_text().replace('android {','''android {
@@ -94,7 +94,7 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: Vortex-Beta-Classicos-Android6plus-ARM64
+          name: Mega-Drive-Hack-Android6plus-ARM64
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 30
@@ -102,7 +102,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: beta-build-${{ github.run_number }}
-          name: Vortex Beta Clássicos — build ${{ github.run_number }}
+          name: Mega Drive Hack — build ${{ github.run_number }}
           body: 'Beta Android 6+ ARM64, criada do zero. 10 sistemas, sem ROM/BIOS incluídos. Builds CI ainda precisam de teste em aparelho e ROMs do usuário.'
           files: app/build/outputs/apk/release/*.apk
           make_latest: true
