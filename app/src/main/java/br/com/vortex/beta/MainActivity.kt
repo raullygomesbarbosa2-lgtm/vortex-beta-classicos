@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
         layoutParams = GridLayout.LayoutParams().apply { width = dp(diameter); height = dp(diameter); setMargins(dp(5), dp(4), dp(5), dp(4)) }
     }
 
-    private inner class VirtualStick(view: GLRetroView) : View(this@MainActivity) {
+    private inner class VirtualStick(private val retroView: GLRetroView) : View(this@MainActivity) {
         private val outer = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(150, 15, 36, 21); style = Paint.Style.FILL }
         private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = neon; style = Paint.Style.STROKE; strokeWidth = dp(3).toFloat() }
         private val thumbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(230, 45, 205, 38); style = Paint.Style.FILL }
@@ -153,11 +153,11 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                     ax = ((event.x-width/2f)/(r*.64f)).coerceIn(-1f,1f)
                     ay = ((event.y-height/2f)/(r*.64f)).coerceIn(-1f,1f)
-                    view.sendMotionEvent(LibretroDroid.MOTION_SOURCE_DPAD, ax, ay)
+                    retroView.sendMotionEvent(LibretroDroid.MOTION_SOURCE_DPAD, ax, ay)
                     invalidate(); return true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    ax=0f; ay=0f; view.sendMotionEvent(LibretroDroid.MOTION_SOURCE_DPAD, 0f, 0f); invalidate(); performClick(); return true
+                    ax=0f; ay=0f; retroView.sendMotionEvent(LibretroDroid.MOTION_SOURCE_DPAD, 0f, 0f); invalidate(); performClick(); return true
                 }
             }
             return true
