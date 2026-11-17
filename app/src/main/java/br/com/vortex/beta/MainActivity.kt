@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         SystemInfo("Super Nintendo", "libsnes9x_libretro_android.so", "smc|sfc|swc|fig"),
         SystemInfo("Game Boy", "libgambatte_libretro_android.so", "gb|gbc"),
         SystemInfo("Game Boy Advance", "libmednafen_gba_libretro_android.so", "gba"),
-        SystemInfo("Mega Drive Hack", "libgenesis_plus_gx_libretro_android.so", "bin|gen|md|smd"),
+        SystemInfo("Sega Genesis / Mega Drive", "libgenesis_plus_gx_libretro_android.so", "bin|gen|md|smd"),
         SystemInfo("PC Engine / TurboGrafx-16", "libmednafen_pce_fast_libretro_android.so", "pce|cue|ccd"),
         SystemInfo("Atari Lynx", "libmednafen_lynx_libretro_android.so", "lnx"),
         SystemInfo("Neo Geo Pocket", "libmednafen_ngp_libretro_android.so", "ngp|ngc"),
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         retro = null
         val scroll = ScrollView(this).apply { setBackgroundColor(bg) }
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(18, 12, 18, 20) }
-        column.addView(label("VORTEX", 32f, neon, true))
+        column.addView(label("MEGA DRIVE HACK", 32f, neon, true))
         column.addView(label("BETA CLÁSSICA  •  Android 6+  •  ARM64", 14f, Color.LTGRAY))
         column.addView(label("10 sistemas clássicos · escolha um e abra sua ROM hack", 17f, Color.WHITE))
         systems.forEach { system ->
