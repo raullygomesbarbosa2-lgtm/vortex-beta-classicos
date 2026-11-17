@@ -10,6 +10,8 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
+import android.view.InputDevice
+import android.hardware.input.InputManager
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -48,6 +50,101 @@ class MainActivity : AppCompatActivity() {
     private val picker = 431
     private var selected: SystemInfo? = null
     private var retro: GLRetroView? = null
+    private var controllerStatus: TextView? = null
+    private val inputManager by lazy { getSystemService(INPUT_SERVICE) as InputManager }
+    private val inputListener = object : InputManager.InputDeviceListener {
+        override fun onInputDeviceAdded(deviceId: Int) = updateControllerStatus()
+        override fun onInputDeviceRemoved(deviceId: Int) = updateControllerStatus()
+        override fun onInputDeviceChanged(deviceId: Int) = updateControllerStatus()
+    }
+    private var inputListenerRegistered = false
+
+    private fun isGameController(device: InputDevice?): Boolean {
+        if (device == null) return false
+        val sources = device.sources
+        return (sources and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
+            (sources and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
+    }
+
+    private fun connectedControllerNames(): List<String> = InputDevice.getDeviceIds()
+        .mapNotNull { InputDevice.getDevice(it) }
+        .filter { isGameController(it) }
+        .map { it.name }.distinct()
+
+    private fun updateControllerStatus() {
+        val names = connectedControllerNames()
+        runOnUiThread {
+            controllerStatus?.text = if (names.isEmpty()) "Controle Bluetooth/USB: nenhum conectado" else "Controle conectado: ${names.joinToString(", ")}"
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!inputListenerRegistered) {
+            inputManager.registerInputDeviceListener(inputListener, null)
+            inputListenerRegistered = true
+        }
+        updateControllerStatus()
+    }
+
+    override fun onStop() {
+        if (inputListenerRegistered) {
+            inputManager.unregisterInputDeviceListener(inputListener)
+            inputListenerRegistered = false
+        }
+        super.onStop()
+    }
+
+    private fun controllerPort(event: KeyEvent) = (event.device?.controllerNumber ?: 1).minus(1).coerceAtLeast(0)
+    private fun controllerPort(event: MotionEvent) = (event.device?.controllerNumber ?: 1).minus(1).coerceAtLeast(0)
+
+    private fun mappedGamepadKey(keyCode: Int): Int = when (keyCode) {
+        KeyEvent.KEYCODE_BUTTON_B -> KeyEvent.KEYCODE_BUTTON_A
+        KeyEvent.KEYCODE_BUTTON_A -> KeyEvent.KEYCODE_BUTTON_B
+        KeyEvent.KEYCODE_BUTTON_X -> KeyEvent.KEYCODE_BUTTON_Y
+        KeyEvent.KEYCODE_BUTTON_Y -> KeyEvent.KEYCODE_BUTTON_X
+        else -> keyCode
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val view = retro
+        if (view != null && isGameController(event.device)) {
+            val supported = when (event.keyCode) {
+                KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT,
+                KeyEvent.KEYCODE_BUTTON_A, KeyEvent.KEYCODE_BUTTON_B, KeyEvent.KEYCODE_BUTTON_X, KeyEvent.KEYCODE_BUTTON_Y,
+                KeyEvent.KEYCODE_BUTTON_START, KeyEvent.KEYCODE_BUTTON_SELECT, KeyEvent.KEYCODE_BUTTON_L1, KeyEvent.KEYCODE_BUTTON_L2,
+                KeyEvent.KEYCODE_BUTTON_R1, KeyEvent.KEYCODE_BUTTON_R2, KeyEvent.KEYCODE_BUTTON_THUMBL, KeyEvent.KEYCODE_BUTTON_THUMBR -> true
+                else -> false
+            }
+            if (supported) {
+                if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount > 0) return true
+                if (event.action == KeyEvent.ACTION_DOWN || event.action == KeyEvent.ACTION_UP) {
+                    view.sendKeyEvent(event.action, mappedGamepadKey(event.keyCode), controllerPort(event))
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        val view = retro
+        val device = event.device
+        if (view != null && isGameController(device) && (event.isFromSource(InputDevice.SOURCE_JOYSTICK) || event.isFromSource(InputDevice.SOURCE_GAMEPAD))) {
+            val port = controllerPort(event)
+            val hatX = event.getAxisValue(MotionEvent.AXIS_HAT_X)
+            val hatY = event.getAxisValue(MotionEvent.AXIS_HAT_Y)
+            val x = event.getAxisValue(MotionEvent.AXIS_X)
+            val y = event.getAxisValue(MotionEvent.AXIS_Y)
+            val rx = if (device?.getMotionRange(MotionEvent.AXIS_RX, event.source) != null) event.getAxisValue(MotionEvent.AXIS_RX) else event.getAxisValue(MotionEvent.AXIS_Z)
+            val ry = if (device?.getMotionRange(MotionEvent.AXIS_RY, event.source) != null) event.getAxisValue(MotionEvent.AXIS_RY) else event.getAxisValue(MotionEvent.AXIS_RZ)
+            view.sendMotionEvent(LibretroDroid.MOTION_SOURCE_DPAD, if (hatX != 0f) hatX else x, if (hatY != 0f) hatY else y, port)
+            view.sendMotionEvent(LibretroDroid.MOTION_SOURCE_ANALOG_LEFT, x, y, port)
+            view.sendMotionEvent(LibretroDroid.MOTION_SOURCE_ANALOG_RIGHT, rx, ry, port)
+            return true
+        }
+        return super.dispatchGenericMotionEvent(event)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); showHome() }
 
@@ -72,6 +169,9 @@ class MainActivity : AppCompatActivity() {
         column.addView(label("MEGA DRIVE HACK", 32f, neon, true))
         column.addView(label("BETA CLÁSSICA  •  Android 6+  •  ARM64", 14f, Color.LTGRAY))
         column.addView(label("10 sistemas clássicos · escolha um e abra sua ROM hack", 17f, Color.WHITE))
+        controllerStatus = label("", 14f, neon)
+        column.addView(controllerStatus)
+        updateControllerStatus()
         systems.forEach { system ->
             val b = styledButton("▶  ${system.name}") { selected = system; chooseRom() }
             column.addView(b, LinearLayout.LayoutParams(-1, 56).apply { setMargins(4, 5, 4, 5) })
@@ -180,6 +280,8 @@ class MainActivity : AppCompatActivity() {
         }
         val root = FrameLayout(this).apply { setBackgroundColor(Color.BLACK) }
         val view = GLRetroView(this, data)
+        view.isFocusable = true
+        view.isFocusableInTouchMode = true
         view.viewport = RectF(0f, 0f, 1f, 1f)
         retro = view
         lifecycle.addObserver(view)
@@ -214,6 +316,7 @@ class MainActivity : AppCompatActivity() {
         controls.addView(aux)
         root.addView(controls, FrameLayout.LayoutParams(-1, dp(174), Gravity.BOTTOM))
         setContentView(root)
+        view.requestFocus()
     }
 
     private fun roundedPanel(): GradientDrawable = GradientDrawable().apply {
