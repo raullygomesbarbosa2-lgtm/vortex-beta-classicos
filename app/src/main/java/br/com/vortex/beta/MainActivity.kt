@@ -66,10 +66,14 @@ class MainActivity : AppCompatActivity() {
             (sources and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
     }
 
-    private fun connectedControllerNames(): List<String> = InputDevice.getDeviceIds()
-        .mapNotNull { InputDevice.getDevice(it) }
-        .filter { isGameController(it) }
-        .map { it.name }.distinct()
+    private fun connectedControllerNames(): List<String> {
+        val names = mutableListOf<String>()
+        for (id in InputDevice.getDeviceIds()) {
+            val device = InputDevice.getDevice(id)
+            if (isGameController(device) && device != null) names.add(device.name)
+        }
+        return names.distinct()
+    }
 
     private fun updateControllerStatus() {
         val names = connectedControllerNames()
