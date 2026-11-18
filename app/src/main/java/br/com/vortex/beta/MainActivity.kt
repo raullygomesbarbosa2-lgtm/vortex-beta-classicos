@@ -167,9 +167,9 @@ class MainActivity : AppCompatActivity() {
         retro = null
         val scroll = ScrollView(this).apply { setBackgroundColor(bg) }
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(18, 12, 18, 20) }
-        column.addView(label("MEGA DRIVE HACK", 32f, neon, true))
-        column.addView(label("BETA CLÁSSICA  •  Android 6+  •  ARM64", 14f, Color.LTGRAY))
-        column.addView(label("100 núcleos clássicos · selecione um e abra sua ROM", 17f, Color.WHITE))
+        column.addView(label("RETROCLÁSSICOS", 32f, neon, true))
+        column.addView(label("BETA  •  Android 6+  •  ARM64", 14f, Color.LTGRAY))
+        column.addView(label("Núcleos clássicos reais · selecione um sistema e abra sua ROM", 17f, Color.WHITE))
         controllerStatus = label("", 14f, neon)
         column.addView(controllerStatus)
         updateControllerStatus()
@@ -357,3 +357,4 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() { super.onResume(); retro?.onResume() }
     override fun onBackPressed() { if (retro != null) { retro?.onPause(); retro?.let { lifecycle.removeObserver(it) }; retro = null; showHome() } else super.onBackPressed() }
 }
+
