@@ -96,12 +96,6 @@
     "extensions": "vb|vboy|bin"
   },
   {
-    "id": "blastem",
-    "name": "Sega 8/16-bit (Various) — BlastEm",
-    "core": "libblastem_libretro_android.so",
-    "extensions": "md|gen|smd|68k|sgd|32x|sms|gg|sg|sg1|sc|sc3|sf7|col|cue|toc|iso|chd|vgm|vgz|flac|wav|bin|rom|gz"
-  },
-  {
     "id": "mednafen_saturn",
     "name": "Saturn — Beetle Saturn",
     "core": "libmednafen_saturn_libretro_android.so",
@@ -286,12 +280,6 @@
     "name": "GameCube / Wii — Dolphin",
     "core": "libdolphin_libretro_android.so",
     "extensions": "gcm|iso|wbfs|ciso|gcz|elf|dol|dff|tgc|wad|rvz|m3u|wia"
-  },
-  {
-    "id": "tgbdual",
-    "name": "Game Boy/Game Boy Color — TGB Dual",
-    "core": "libtgbdual_libretro_android.so",
-    "extensions": "cgb|dmg|gb|gbc|sgb"
   },
   {
     "id": "vice_xpet",
