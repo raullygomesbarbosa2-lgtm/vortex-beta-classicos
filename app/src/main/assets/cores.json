@@ -66,142 +66,10 @@
     "extensions": "xfd|atr|dcm|cas|bin|a52|zip|atx|car|rom|com|xex|m3u"
   },
   {
-    "id": "handy",
-    "name": "Lynx — Handy",
-    "core": "libhandy_libretro_android.so",
-    "extensions": "lnx|lyx|o"
-  },
-  {
-    "id": "gearlynx",
-    "name": "Lynx — Gearlynx",
-    "core": "libgearlynx_libretro_android.so",
-    "extensions": "lnx|lyx|o|bin"
-  },
-  {
     "id": "virtualjaguar",
     "name": "Jaguar — Virtual Jaguar",
     "core": "libvirtualjaguar_libretro_android.so",
     "extensions": "j64|jag|rom|abs|cof|bin|prg|cue|cdi|chd"
-  },
-  {
-    "id": "mesen",
-    "name": "Nintendo Entertainment System — Mesen",
-    "core": "libmesen_libretro_android.so",
-    "extensions": "nes|fds|unf|unif"
-  },
-  {
-    "id": "nestopia",
-    "name": "Nintendo Entertainment System — Nestopia",
-    "core": "libnestopia_libretro_android.so",
-    "extensions": "nes|fds|unf|unif|nsf"
-  },
-  {
-    "id": "fixnes",
-    "name": "Nintendo Entertainment System — fixNES",
-    "core": "libfixnes_libretro_android.so",
-    "extensions": "nes|fds|qd|nsf"
-  },
-  {
-    "id": "snes9x2002",
-    "name": "Super Nintendo Entertainment System — Snes9x 2002",
-    "core": "libsnes9x2002_libretro_android.so",
-    "extensions": "smc|fig|sfc|gd3|gd7|dx2|bsx|swc"
-  },
-  {
-    "id": "snes9x2005",
-    "name": "Super Nintendo Entertainment System — Snes9x 2005",
-    "core": "libsnes9x2005_libretro_android.so",
-    "extensions": "smc|fig|sfc|gd3|gd7|dx2|bsx|swc"
-  },
-  {
-    "id": "snes9x2005_plus",
-    "name": "Super Nintendo Entertainment System — Snes9x 2005 Plus",
-    "core": "libsnes9x2005_plus_libretro_android.so",
-    "extensions": "smc|fig|sfc|gd3|gd7|dx2|bsx|swc"
-  },
-  {
-    "id": "snes9x2010",
-    "name": "Super Nintendo Entertainment System — Snes9x 2010",
-    "core": "libsnes9x2010_libretro_android.so",
-    "extensions": "smc|fig|sfc|gd3|gd7|dx2|bsx|swc"
-  },
-  {
-    "id": "bsnes",
-    "name": "Super Nintendo Entertainment System — bsnes",
-    "core": "libbsnes_libretro_android.so",
-    "extensions": "smc|sfc|swc|fig|gb|gbc|bs"
-  },
-  {
-    "id": "bsnes2014_accuracy",
-    "name": "Super Nintendo Entertainment System — bsnes 2014 Accuracy",
-    "core": "libbsnes2014_accuracy_libretro_android.so",
-    "extensions": "sfc|smc|bml|gb|gbc|st|bs"
-  },
-  {
-    "id": "bsnes2014_performance",
-    "name": "Super Nintendo Entertainment System — bsnes 2014 Performance",
-    "core": "libbsnes2014_performance_libretro_android.so",
-    "extensions": "sfc|smc|bml|gb|gbc|st|bs"
-  },
-  {
-    "id": "bsnes_mercury_accuracy",
-    "name": "Super Nintendo Entertainment System — bsnes-mercury Accuracy",
-    "core": "libbsnes_mercury_accuracy_libretro_android.so",
-    "extensions": "sfc|smc|bml|gb|gbc|st|bs"
-  },
-  {
-    "id": "bsnes_mercury_performance",
-    "name": "Super Nintendo Entertainment System — bsnes-mercury Performance",
-    "core": "libbsnes_mercury_performance_libretro_android.so",
-    "extensions": "sfc|smc|bml|gb|gbc|st|bs"
-  },
-  {
-    "id": "mednafen_snes",
-    "name": "Super Nintendo Entertainment System — Beetle bsnes",
-    "core": "libmednafen_snes_libretro_android.so",
-    "extensions": "smc|fig|bs|st|sfc"
-  },
-  {
-    "id": "mesen-s",
-    "name": "Super Nintendo Entertainment System / Game Boy / Game Boy Color — Mesen-S",
-    "core": "libmesen-s_libretro_android.so",
-    "extensions": "sfc|smc|fig|swc|bs|gb|gbc"
-  },
-  {
-    "id": "mgba",
-    "name": "Game Boy/Game Boy Color/Game Boy Advance — mGBA",
-    "core": "libmgba_libretro_android.so",
-    "extensions": "gb|gbc|gba"
-  },
-  {
-    "id": "gearboy",
-    "name": "Game Boy/Game Boy Color/Super Game Boy — Gearboy",
-    "core": "libgearboy_libretro_android.so",
-    "extensions": "gb|dmg|gbc|cgb|sgb"
-  },
-  {
-    "id": "sameboy",
-    "name": "Game Boy/Game Boy Color — SameBoy",
-    "core": "libsameboy_libretro_android.so",
-    "extensions": "gb|gbc"
-  },
-  {
-    "id": "gpsp",
-    "name": "Game Boy Advance — gpSP",
-    "core": "libgpsp_libretro_android.so",
-    "extensions": "gba|bin"
-  },
-  {
-    "id": "vba_next",
-    "name": "Game Boy Advance — VBA Next",
-    "core": "libvba_next_libretro_android.so",
-    "extensions": "gba"
-  },
-  {
-    "id": "vbam",
-    "name": "Game Boy/Game Boy Color/Game Boy Advance — VBA-M",
-    "core": "libvbam_libretro_android.so",
-    "extensions": "dmg|gb|gbc|cgb|sgb|gba"
   },
   {
     "id": "pokemini",
@@ -216,12 +84,6 @@
     "extensions": "nds|ids|dsi"
   },
   {
-    "id": "desmume",
-    "name": "Nintendo DS — DeSmuME",
-    "core": "libdesmume_libretro_android.so",
-    "extensions": "nds|ids|bin"
-  },
-  {
     "id": "mupen64plus_next_gles3",
     "name": "Nintendo 64 — Mupen64Plus-Next GLES3",
     "core": "libmupen64plus_next_gles3_libretro_android.so",
@@ -234,40 +96,16 @@
     "extensions": "vb|vboy|bin"
   },
   {
-    "id": "picodrive",
-    "name": "Sega 8/16-bit + 32X (Various) — PicoDrive",
-    "core": "libpicodrive_libretro_android.so",
-    "extensions": "bin|gen|smd|md|32x|cue|iso|chd|sms|gg|sg|sc|m3u|68k|sgd|pco"
-  },
-  {
     "id": "blastem",
     "name": "Sega 8/16-bit (Various) — BlastEm",
     "core": "libblastem_libretro_android.so",
     "extensions": "md|gen|smd|68k|sgd|32x|sms|gg|sg|sg1|sc|sc3|sf7|col|cue|toc|iso|chd|vgm|vgz|flac|wav|bin|rom|gz"
   },
   {
-    "id": "gearsystem",
-    "name": "Sega 8-bit (MS/GG/SG-1000) — Gearsystem",
-    "core": "libgearsystem_libretro_android.so",
-    "extensions": "sms|gg|sg|mv|bin|rom"
-  },
-  {
-    "id": "smsplus",
-    "name": "Sega 8-bit — SMS Plus GX",
-    "core": "libsmsplus_libretro_android.so",
-    "extensions": "sms|bin|rom|col|gg|sg"
-  },
-  {
     "id": "mednafen_saturn",
     "name": "Saturn — Beetle Saturn",
     "core": "libmednafen_saturn_libretro_android.so",
     "extensions": "ccd|chd|cue|toc|m3u|zip"
-  },
-  {
-    "id": "yabasanshiro",
-    "name": "Saturn — YabaSanshiro",
-    "core": "libyabasanshiro_libretro_android.so",
-    "extensions": "bin|ccd|chd|cue|iso|mds|zip"
   },
   {
     "id": "flycast",
@@ -288,94 +126,16 @@
     "extensions": "cue|chd"
   },
   {
-    "id": "fbalpha2012_neogeo",
-    "name": "Neo Geo — FB Alpha 2012 Neo Geo",
-    "core": "libfbalpha2012_neogeo_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "mednafen_pce",
-    "name": "PC Engine/SuperGrafx/CD — Beetle PCE",
-    "core": "libmednafen_pce_libretro_android.so",
-    "extensions": "pce|sgx|cue|ccd|chd|toc|m3u"
-  },
-  {
-    "id": "geargrafx",
-    "name": "PC Engine/SuperGrafx/CD/LaserActive — Geargrafx",
-    "core": "libgeargrafx_libretro_android.so",
-    "extensions": "pce|sgx|hes|cue|chd|mmi"
-  },
-  {
     "id": "mednafen_pcfx",
     "name": "PC-FX — Beetle PC-FX",
     "core": "libmednafen_pcfx_libretro_android.so",
     "extensions": "cue|ccd|toc|chd"
   },
   {
-    "id": "mame2000",
-    "name": "Arcade (various) — MAME 2000",
-    "core": "libmame2000_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "mame2003",
-    "name": "Arcade (various) — MAME 2003",
-    "core": "libmame2003_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "mame2003_plus",
-    "name": "Arcade (various) — MAME 2003-Plus",
-    "core": "libmame2003_plus_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "mame2010",
-    "name": "Arcade (various) — MAME 2010",
-    "core": "libmame2010_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "fbalpha2012",
-    "name": "Arcade (various) — FB Alpha 2012",
-    "core": "libfbalpha2012_libretro_android.so",
-    "extensions": "iso|zip|7z"
-  },
-  {
-    "id": "fbalpha2012_cps1",
-    "name": "CP System I — FB Alpha 2012 CPS-1",
-    "core": "libfbalpha2012_cps1_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "fbalpha2012_cps2",
-    "name": "CP System II — FB Alpha 2012 CPS-2",
-    "core": "libfbalpha2012_cps2_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "fbalpha2012_cps3",
-    "name": "CP System III — FB Alpha 2012 CPS-3",
-    "core": "libfbalpha2012_cps3_libretro_android.so",
-    "extensions": "zip"
-  },
-  {
-    "id": "fbneo",
-    "name": "Arcade (various) — FinalBurn Neo",
-    "core": "libfbneo_libretro_android.so",
-    "extensions": "zip|7z|cue|ccd"
-  },
-  {
     "id": "bluemsx",
     "name": "MSX/SVI/ColecoVision/SG-1000 — blueMSX",
     "core": "libbluemsx_libretro_android.so",
     "extensions": "rom|ri|mx1|mx2|dsk|col|sg|sc|sf|cas|m3u"
-  },
-  {
-    "id": "openmsx",
-    "name": "MSX — OpenMSX",
-    "core": "libopenmsx_libretro_android.so",
-    "extensions": "rom|mx1|mx2|dsk|fdi|cas|m3u"
   },
   {
     "id": "cap32",
@@ -430,12 +190,6 @@
     "name": "DOS — DOSBox-Pure",
     "core": "libdosbox_pure_libretro_android.so",
     "extensions": "zip|dosz|exe|com|bat|iso|chd|cue|ins|img|ima|vhd|jrc|tc|m3u|m3u8|conf|/"
-  },
-  {
-    "id": "fmsx",
-    "name": "MSX — fMSX",
-    "core": "libfmsx_libretro_android.so",
-    "extensions": "rom|mx1|mx2|dsk|fdi|cas|m3u"
   },
   {
     "id": "px68k",
@@ -522,52 +276,10 @@
     "extensions": "ch8|sc8|xo8"
   },
   {
-    "id": "stella",
-    "name": "Atari 2600 — Stella",
-    "core": "libstella_libretro_android.so",
-    "extensions": "a26|bin"
-  },
-  {
-    "id": "stella2023",
-    "name": "Atari 2600 — Stella 2023",
-    "core": "libstella2023_libretro_android.so",
-    "extensions": "a26|bin"
-  },
-  {
     "id": "hatari2014",
     "name": "Atari ST/STE/TT/Falcon — Hatari 2014",
     "core": "libhatari2014_libretro_android.so",
     "extensions": "st|msa|zip|stx|dim|ipf|vhd|gem|ide|m3u"
-  },
-  {
-    "id": "bsnes-jg",
-    "name": "Super Nintendo Entertainment System — bsnes-jg",
-    "core": "libbsnes-jg_libretro_android.so",
-    "extensions": "smc|sfc|st|gb|gbc|bs"
-  },
-  {
-    "id": "bsnes_cplusplus98",
-    "name": "Super Nintendo Entertainment System — v085)",
-    "core": "libbsnes_cplusplus98_libretro_android.so",
-    "extensions": "sfc|smc|gb|gbc|st|bs"
-  },
-  {
-    "id": "bsnes_mercury_balanced",
-    "name": "Super Nintendo Entertainment System — bsnes-mercury Balanced",
-    "core": "libbsnes_mercury_balanced_libretro_android.so",
-    "extensions": "sfc|smc|bml|gb|gbc|st|bs"
-  },
-  {
-    "id": "mupen64plus_next_gles2",
-    "name": "Nintendo 64 — Mupen64Plus-Next GLES2",
-    "core": "libmupen64plus_next_gles2_libretro_android.so",
-    "extensions": "n64|v64|z64|ndd|bin|u1"
-  },
-  {
-    "id": "clownmdemu",
-    "name": "Sega Genesis — ClownMDEmu",
-    "core": "libclownmdemu_libretro_android.so",
-    "extensions": "bin|md|gen|cue|iso|chd"
   },
   {
     "id": "dolphin",
@@ -580,18 +292,6 @@
     "name": "Game Boy/Game Boy Color — TGB Dual",
     "core": "libtgbdual_libretro_android.so",
     "extensions": "cgb|dmg|gb|gbc|sgb"
-  },
-  {
-    "id": "yabause",
-    "name": "Saturn — Yabause",
-    "core": "libyabause_libretro_android.so",
-    "extensions": "bin|ccd|chd|cue|iso|mds|zip|m3u"
-  },
-  {
-    "id": "parallel_n64",
-    "name": "Nintendo 64 — ParaLLEl N64",
-    "core": "libparallel_n64_libretro_android.so",
-    "extensions": "n64|v64|z64|bin|u1|ndd"
   },
   {
     "id": "vice_xpet",
