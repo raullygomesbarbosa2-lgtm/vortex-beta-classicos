@@ -1,4 +1,4 @@
-name: Mega Drive Hack — 10 sistemas clássicos
+name: RetroClássicos — Beta de sistemas clássicos
 on:
   workflow_dispatch:
   push:
@@ -25,76 +25,63 @@ jobs:
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
           yes | "$S" --sdk_root="$ANDROID_HOME" --licenses
           "$S" --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0" "ndk;${NDK_VERSION}" "cmake;3.22.1"
-      - name: Download 100 official Libretro ARM64 cores
+      - name: Download official Libretro ARM64 cores
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import concurrent.futures, io, json, struct, urllib.request, zipfile
+          import concurrent.futures, io, json, struct, urllib.request, zipfile, time
           from pathlib import Path
           catalog = json.loads(Path('app/src/main/assets/cores.json').read_text())
           out = Path('app/src/main/jniLibs/arm64-v8a'); out.mkdir(parents=True, exist_ok=True)
           base = 'https://buildbot.libretro.com/nightly/android/latest/arm64-v8a/'
           def get_core(item):
-              import time
-              ident = item['id']
-              url = base + ident + '_libretro_android.so.zip'
-              last_error = None
+              error = None
               for attempt in range(1, 6):
                   try:
-                      req = urllib.request.Request(url, headers={'User-Agent':'MegaDriveHack-AndroidCorePack/1.0'})
-                      with urllib.request.urlopen(req, timeout=300) as response:
-                          payload = response.read()
-                      with zipfile.ZipFile(io.BytesIO(payload)) as archive:
-                          members = [n for n in archive.namelist() if n.endswith('.so') and not n.endswith('/')]
-                          if len(members) != 1:
-                              raise RuntimeError(f'{ident}: expected one shared library in official zip; found {members}')
-                          binary = archive.read(members[0])
-                      if len(binary) < 4096 or binary[:6] != b'\x7fELF\x02\x01' or struct.unpack_from('<H', binary, 18)[0] != 183:
-                          raise RuntimeError(f'{ident}: core is not a valid ARM64 ELF shared library')
-                      (out / item['core']).write_bytes(binary)
-                      return ident, len(binary)
-                  except Exception as error:
-                      last_error = error
-                      if attempt < 5:
-                          print(f'Retry {attempt}/5 for {ident}: {error}', flush=True)
-                          time.sleep(min(5 * attempt, 25))
-              raise RuntimeError(f'Could not download {ident} after five attempts: {last_error}')
-          if len(catalog) != 100 or len({x['id'] for x in catalog}) != 100:
-              raise SystemExit('Core catalog must contain exactly 100 unique cores')
+                      req=urllib.request.Request(base+item['id']+'_libretro_android.so.zip',headers={'User-Agent':'RetroClassicos-AndroidCorePack/1.0'})
+                      with urllib.request.urlopen(req,timeout=300) as r: payload=r.read()
+                      with zipfile.ZipFile(io.BytesIO(payload)) as z:
+                          members=[n for n in z.namelist() if n.endswith('.so') and not n.endswith('/')]
+                          if len(members)!=1: raise RuntimeError(f"{item['id']}: expected one .so; found {members}")
+                          data=z.read(members[0])
+                      if len(data)<4096 or data[:6]!=b'\x7fELF\x02\x01' or struct.unpack_from('<H',data,18)[0]!=183: raise RuntimeError(f"{item['id']}: invalid ARM64 ELF")
+                      (out/item['core']).write_bytes(data); return item['id'],len(data)
+                  except Exception as e:
+                      error=e
+                      if attempt<5: print(f'Retry {attempt}/5 {item["id"]}: {e}',flush=True); time.sleep(min(5*attempt,25))
+              raise RuntimeError(f"Could not download {item['id']}: {error}")
+          if len(catalog)!=len({x['id'] for x in catalog}) or len(catalog)!=len({x['core'] for x in catalog}): raise SystemExit('Duplicate core catalog entries')
+          if sum('Super Nintendo Entertainment System' in x['name'] for x in catalog)!=1: raise SystemExit('Catalog must contain one SNES core')
+          if any(any(s in x['name'].lower() for s in ('playstation','psx','psp','ps2','ps3','ps vita')) for x in catalog): raise SystemExit('Sony system not allowed')
           with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
-              for ident, size in pool.map(get_core, catalog):
-                  print(f'Fetched {ident}: {size} bytes')
-          print(f'Downloaded and checked {len(catalog)} official Android ARM64 Libretro cores.')
+              for ident,size in pool.map(get_core,catalog): print(f'Fetched {ident}: {size} bytes')
+          print(f'Downloaded and checked {len(catalog)} official Android ARM64 cores.')
           PY
-      - name: Verify 100 native ARM64 core libraries
+      - name: Verify native ARM64 cores and catalog
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import json, struct
-          catalog=json.loads(Path('app/src/main/assets/cores.json').read_text())
-          p=Path('app/src/main/jniLibs/arm64-v8a')
-          libs=list(p.glob('*.so'))
-          expected={x['core'] for x in catalog}
-          actual={x.name for x in libs}
-          if len(catalog)!=100 or len(expected)!=100: raise SystemExit('Catalog is not 100 unique cores')
-          if actual!=expected: raise SystemExit(f'Core files mismatch; missing={expected-actual}, extra={actual-expected}')
-          for f in libs:
+          import json,struct
+          c=json.loads(Path('app/src/main/assets/cores.json').read_text()); p=Path('app/src/main/jniLibs/arm64-v8a')
+          expected={x['core'] for x in c}; actual={x.name for x in p.glob('*.so')}
+          if actual!=expected: raise SystemExit(f'Files mismatch: missing={expected-actual}, extra={actual-expected}')
+          for f in p.glob('*.so'):
             d=f.read_bytes()
             if d[:6]!=b'\x7fELF\x02\x01' or struct.unpack_from('<H',d,18)[0]!=183: raise SystemExit(f'Not ARM64 ELF: {f}')
-          print('Exactly 100 official ARM64 Libretro core libraries verified.')
+          print(f'Exactly {len(c)} official ARM64 cores verified.')
           PY
       - name: Sign Beta APK with temporary CI key
         run: |
-          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/vortex-beta.jks" -storepass beta-ci-only -keypass beta-ci-only -alias vortex-beta -dname 'CN=Mega Drive Hack CI,O=Mega Drive Hack,C=BR' -keyalg RSA -keysize 2048 -validity 3650
+          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/retroclassicos-beta.jks" -storepass beta-ci-only -keypass beta-ci-only -alias retroclassicos -dname 'CN=RetroClassicos CI,O=RetroClassicos,C=BR' -keyalg RSA -keysize 2048 -validity 3650
           python3 - <<'PY'
           from pathlib import Path
           p=Path('app/build.gradle'); s=p.read_text().replace('android {','''android {
               signingConfigs { betaRelease { storeFile file(System.getenv("CI_KEYSTORE")); storePassword System.getenv("CI_STORE_PASSWORD"); keyAlias System.getenv("CI_KEY_ALIAS"); keyPassword System.getenv("CI_KEY_PASSWORD") } }
               buildTypes { release { signingConfig signingConfigs.betaRelease; minifyEnabled false } }''',1); p.write_text(s)
           PY
-          echo "CI_KEYSTORE=$RUNNER_TEMP/vortex-beta.jks" >> "$GITHUB_ENV"
+          echo "CI_KEYSTORE=$RUNNER_TEMP/retroclassicos-beta.jks" >> "$GITHUB_ENV"
           echo 'CI_STORE_PASSWORD=beta-ci-only' >> "$GITHUB_ENV"
-          echo 'CI_KEY_ALIAS=vortex-beta' >> "$GITHUB_ENV"
+          echo 'CI_KEY_ALIAS=retroclassicos' >> "$GITHUB_ENV"
           echo 'CI_KEY_PASSWORD=beta-ci-only' >> "$GITHUB_ENV"
       - name: Assemble and verify APK
         run: |
@@ -102,27 +89,28 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
+          import json
+          c=json.loads(Path('app/src/main/assets/cores.json').read_text())
           apks=list(Path('app/build/outputs/apk/release').glob('*.apk'))
-          if len(apks)!=1: raise SystemExit(f'Expected one release APK, found: {apks}')
+          if len(apks)!=1: raise SystemExit(f'Expected one release APK, found {apks}')
           p=apks[0]
-          if p.stat().st_size < 1_000_000: raise SystemExit(f'APK missing or unexpectedly small: {p} ({p.stat().st_size} bytes)')
+          if p.stat().st_size<1_000_000: raise SystemExit('APK unexpectedly small')
           with ZipFile(p) as z:
             n=z.namelist(); libs=[x for x in n if x.startswith('lib/arm64-v8a/') and x.endswith('.so')]
-            if len(libs)<101: raise SystemExit(f'Expected frontend plus 100 cores, found {len(libs)} native libs')
+            if len(libs)<len(c)+1: raise SystemExit(f'Expected frontend plus {len(c)} cores, found {len(libs)} native libs')
             if any(x.startswith('lib/armeabi') for x in n): raise SystemExit('Unexpected ABI packaged')
-          print('APK built and contains ten core libraries:', p.stat().st_size, 'bytes')
+          print(f'APK verified: {p.stat().st_size} bytes; {len(c)} catalog cores.')
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: Mega-Drive-Hack-100-Cores-Android6plus-ARM64
+          name: RetroClassicos-Beta-Android6plus-ARM64
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 30
-      - name: Publish APK download release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
-          tag_name: beta-build-${{ github.run_number }}
-          name: Mega Drive Hack — build ${{ github.run_number }}
-          body: 'Mega Drive Hack Beta, Android 6+ ARM64. 100 núcleos Libretro oficiais, sem ROM/BIOS incluídos. ROMs do usuário; testes em aparelho físico ainda pendentes.'
+          tag_name: retroclassicos-build-${{ github.run_number }}
+          name: RetroClássicos — build ${{ github.run_number }}
+          body: 'RetroClássicos Beta, Android 6+ ARM64. Núcleos oficiais sem duplicar consoles, sem Sony, um núcleo Super Nintendo. Não inclui ROMs/BIOS. CI validada; teste em aparelho físico pendente.'
           files: app/build/outputs/apk/release/*.apk
           make_latest: true
